@@ -14,7 +14,7 @@ const SignUpPage = () => {
           <h1 className="text-3xl font-bold">CourseForge</h1>
           <p className="mt-2 text-gray-600">Integration Platform for Education</p>
         </div>
-        <div className="mt-8 bg-white px-4 shadow sm:rounded-lg sm:px-0 py-0 my-0">
+        <div className="mt-8 bg-white shadow sm:rounded-lg">
           <SignUp redirectUrl="/dashboard" />
         </div>
       </div>
