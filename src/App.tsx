@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ClerkLoaded, useAuth } from "@clerk/clerk-react";
+import { Navbar } from "@/components/Navbar";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Workflows from "./pages/Workflows";
@@ -38,6 +39,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <ClerkLoaded>
+          <Navbar />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />

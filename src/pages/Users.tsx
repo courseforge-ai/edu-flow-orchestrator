@@ -1,26 +1,35 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users as UsersIcon } from "lucide-react";
+import { Sidebar } from "@/components/Sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Users = () => {
+  const isMobile = useIsMobile();
+
   return (
-    <div className="container mx-auto py-4">
-      <div className="grid gap-8">
-        <div className="flex items-center gap-2">
-          <UsersIcon className="h-6 w-6" />
-          <h1 className="text-2xl font-bold">Users</h1>
+    <div className="flex">
+      {!isMobile && <Sidebar />}
+      <div className="flex-1">
+        <div className="container mx-auto py-4">
+          <div className="grid gap-8">
+            <div className="flex items-center gap-2">
+              <UsersIcon className="h-6 w-6" />
+              <h1 className="text-2xl font-bold">Users</h1>
+            </div>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>User Management</CardTitle>
+                <CardDescription>Manage your organization users</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>Add, edit, and remove users from your organization.</p>
+                <p className="text-muted-foreground mt-2">Coming soon: Role-based permissions</p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>User Management</CardTitle>
-            <CardDescription>Manage your organization users</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>Add, edit, and remove users from your organization.</p>
-            <p className="text-muted-foreground mt-2">Coming soon: Role-based permissions</p>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
