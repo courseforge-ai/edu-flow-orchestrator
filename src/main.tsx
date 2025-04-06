@@ -13,17 +13,21 @@ import { VITE_CLERK_PUBLISHABLE_KEY } from "./lib/clerk";
 
 const queryClient = new QueryClient();
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+// Create the React element tree
+const app = (
   <React.StrictMode>
     <ClerkProvider publishableKey={VITE_CLERK_PUBLISHABLE_KEY}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <App />
             <Toaster />
-          </BrowserRouter>
-        </QueryClientProvider>
-      </ThemeProvider>
+          </ThemeProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
     </ClerkProvider>
   </React.StrictMode>
 );
+
+// Render the app
+ReactDOM.createRoot(document.getElementById("root")!).render(app);
