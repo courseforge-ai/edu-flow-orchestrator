@@ -1,16 +1,37 @@
-import { Menu } from "lucide-react";
+
+import { Anvil, Menu } from "lucide-react";
 import { useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Link } from "react-router-dom";
+import { DarkModeToggle } from "./DarkModeToggle";
+import { UserButton } from "@clerk/clerk-react";
 
 export function Navbar() {
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, signOut } = useAuth();
   const isMobile = useIsMobile();
 
-  // Define the main navigation links.
-  const navLinks = (
+  // Define the navigation links based on authentication status
+  const navLinks = isSignedIn ? (
+    <>
+      <Link to="/dashboard" className="text-sm font-medium hover:text-primary">
+        Dashboard
+      </Link>
+      <Link to="/workflows" className="text-sm font-medium hover:text-primary">
+        Workflows
+      </Link>
+      <Link to="/integrations" className="text-sm font-medium hover:text-primary">
+        Integrations
+      </Link>
+      <Link to="/users" className="text-sm font-medium hover:text-primary">
+        Users
+      </Link>
+      <Link to="/admin" className="text-sm font-medium hover:text-primary">
+        Super Admin
+      </Link>
+    </>
+  ) : (
     <>
       <Link to="/#features" className="text-sm font-medium hover:text-primary">
         Features
@@ -30,11 +51,15 @@ export function Navbar() {
     </>
   );
 
-  // Define the authentication buttons.
+  // Define the authentication buttons/user menu
   const authLinks = isSignedIn ? (
-    <Button asChild>
-      <Link to="/dashboard">Dashboard</Link>
-    </Button>
+    <div className="flex items-center gap-3">
+      <UserButton afterSignOutUrl="/" />
+      <DarkModeToggle />
+      <Button variant="outline" onClick={() => signOut()}>
+        Sign Out
+      </Button>
+    </div>
   ) : (
     <>
       <Button asChild variant="outline" className="hidden sm:flex">
@@ -64,15 +89,26 @@ export function Navbar() {
                   {navLinks}
                   <div className="pt-4 border-t">
                     {isSignedIn ? (
-                      <Button asChild>
-                        <Link to="/dashboard">Dashboard</Link>
-                      </Button>
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2">
+                          <UserButton afterSignOutUrl="/" />
+                          <span>Account</span>
+                        </div>
+                        <DarkModeToggle />
+                        <Button 
+                          variant="outline"
+                          className="w-full justify-start"
+                          onClick={() => signOut()}
+                        >
+                          Sign Out
+                        </Button>
+                      </div>
                     ) : (
                       <>
-                        <Button asChild variant="outline">
+                        <Button asChild variant="outline" className="w-full mb-2">
                           <Link to="/sign-in">Sign In</Link>
                         </Button>
-                        <Button asChild>
+                        <Button asChild className="w-full">
                           <Link to="/sign-up">Get Started Free</Link>
                         </Button>
                       </>
@@ -83,8 +119,8 @@ export function Navbar() {
             </Sheet>
           )}
           {/* Brand/logo link */}
-          <Link to="/" className="flex items-center gap-2 text-xl font-bold">
-            {/* Optionally, insert an icon (e.g. an Anvil) here */}
+          <Link to={isSignedIn ? "/dashboard" : "/"} className="flex items-center gap-2 text-xl font-bold">
+            <Anvil className="h-6 w-6" />
             CourseForge
           </Link>
         </div>
