@@ -2,8 +2,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ClerkLoaded, useAuth } from "@clerk/clerk-react";
 import { Navbar } from "@/components/Navbar";
 import Index from "./pages/Index";
@@ -15,8 +13,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
 import WorkflowBuilder from "./pages/workflow-builder";
-
-const queryClient = new QueryClient();
+import { Routes, Route, Navigate } from "react-router-dom";
 
 // Protected route component
 const RequireAuth = ({ children }: { children: React.ReactNode }) => {
@@ -34,28 +31,24 @@ const RequireAuth = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <ClerkLoaded>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-            <Route path="/workflows" element={<RequireAuth><Workflows /></RequireAuth>} />
-            <Route path="/workflow-builder" element={<RequireAuth><WorkflowBuilder /></RequireAuth>} />
-            <Route path="/integrations" element={<RequireAuth><Integrations /></RequireAuth>} />
-            <Route path="/users" element={<RequireAuth><Users /></RequireAuth>} />
-            <Route path="/sign-in/*" element={<SignIn />} />
-            <Route path="/sign-up/*" element={<SignUp />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </ClerkLoaded>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <TooltipProvider>
+    <Toaster />
+    <Sonner />
+    <ClerkLoaded>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+        <Route path="/workflows" element={<RequireAuth><Workflows /></RequireAuth>} />
+        <Route path="/workflow-builder" element={<RequireAuth><WorkflowBuilder /></RequireAuth>} />
+        <Route path="/integrations" element={<RequireAuth><Integrations /></RequireAuth>} />
+        <Route path="/users" element={<RequireAuth><Users /></RequireAuth>} />
+        <Route path="/sign-in/*" element={<SignIn />} />
+        <Route path="/sign-up/*" element={<SignUp />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </ClerkLoaded>
+  </TooltipProvider>
 );
 
 export default App;
