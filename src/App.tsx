@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Workflows from "./pages/Workflows";
 import Integrations from "./pages/integrations";
 import Users from "./pages/Users";
+import Admin from "./pages/Admin";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
@@ -43,6 +44,7 @@ const App = () => (
         <Route path="/workflow-builder" element={<RequireAuth><WorkflowBuilder /></RequireAuth>} />
         <Route path="/integrations" element={<RequireAuth><Integrations /></RequireAuth>} />
         <Route path="/users" element={<RequireAuth><Users /></RequireAuth>} />
+        <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
         <Route path="/sign-in/*" element={<SignIn />} />
         <Route path="/sign-up/*" element={<SignUp />} />
         <Route path="*" element={<NotFound />} />

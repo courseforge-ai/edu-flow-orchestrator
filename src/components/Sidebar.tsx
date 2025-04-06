@@ -5,7 +5,8 @@ import {
   Workflow, 
   Link as LinkIcon, 
   Users, 
-  LogOut 
+  LogOut,
+  Settings
 } from "lucide-react";
 import { useClerk, UserButton } from "@clerk/clerk-react";
 import { cn } from "@/lib/utils";
@@ -56,6 +57,10 @@ export function Sidebar() {
       </div>
       <Separator />
       <div className="mt-auto p-4 space-y-2">
+        <div className="space-y-1 mb-4">
+          <NavItem to="/admin" icon={Settings} label="Super Admin" />
+        </div>
+        <Separator />
         <div className="flex items-center gap-2 px-3 py-2">
           <UserButton afterSignOutUrl="/" />
           <span className="text-sm">Account</span>
