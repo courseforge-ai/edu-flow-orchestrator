@@ -9,7 +9,7 @@ import { Navbar } from "@/components/Navbar";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Workflows from "./pages/Workflows";
-import Integrations from "./pages/Integrations";
+import Integrations from "./pages/integrations";
 import Users from "./pages/Users";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
