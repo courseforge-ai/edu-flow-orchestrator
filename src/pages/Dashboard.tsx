@@ -3,7 +3,6 @@ import { useUser } from "@clerk/clerk-react";
 import { Navigate } from "react-router-dom";
 import { UserProfile } from "@/components/UserProfile";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Navbar } from "@/components/Navbar";
 import { Sidebar } from "@/components/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { LayoutDashboard } from "lucide-react";
@@ -24,16 +23,15 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       <div className="flex flex-1">
         {!isMobile && (
           <aside className="hidden md:flex w-64 flex-col border-r bg-background">
             <Sidebar />
           </aside>
         )}
-        <main className="flex-1 p-4 overflow-auto pb-16 md:pb-4">
-          <div className="container mx-auto py-4">
-            <div className="grid gap-8">
+        <main className="flex-1 overflow-auto pb-16 md:pb-4 w-full">
+          <div className="container mx-auto py-4 px-4 md:px-6">
+            <div className="grid gap-6">
               <div className="flex items-center gap-2">
                 <LayoutDashboard className="h-6 w-6" />
                 <h1 className="text-2xl font-bold">Dashboard</h1>
