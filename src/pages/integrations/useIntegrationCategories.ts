@@ -1,11 +1,12 @@
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { IntegrationCategory, IntegrationCategoryDB, IntegrationDB } from "./types";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   GraduationCap, Mail, Calendar, CheckCircle, Users, DollarSign, FolderOpen, 
   BookOpen, BarChart2, Zap, Brain, Monitor, LucideIcon
 } from "lucide-react";
+import React from "react"; // Import React for createElement
 
 // Map icon strings from the database to Lucide React icons
 const iconMapping: Record<string, LucideIcon> = {
@@ -62,11 +63,16 @@ export const useIntegrationCategories = () => {
           // Create icon component from string name
           const IconComponent = iconMapping[category.icon];
           
+          // Create the icon React element using createElement instead of JSX
+          const iconElement = IconComponent 
+            ? React.createElement(IconComponent, { className: "h-5 w-5" }) 
+            : null;
+          
           return {
             id: category.id,
             title: category.title,
             description: category.description,
-            icon: IconComponent ? <IconComponent className="h-5 w-5" /> : null,
+            icon: iconElement,
             integrations: categoryIntegrations
           };
         });
