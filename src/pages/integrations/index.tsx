@@ -14,7 +14,8 @@ const Integrations = () => {
     filteredCategories,
     totalIntegrations,
     availableCount,
-    upcomingCount
+    upcomingCount,
+    isLoading
   } = useIntegrations();
   
   const isMobile = useIsMobile();
@@ -38,6 +39,7 @@ const Integrations = () => {
           <IntegrationsContent 
             filteredCategories={filteredCategories}
             searchQuery={searchQuery}
+            isLoading={isLoading}
           />
         </div>
       </div>

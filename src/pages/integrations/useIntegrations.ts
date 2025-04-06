@@ -1,14 +1,19 @@
 
 import { useState, useMemo } from "react";
-import { integrationCategories } from "./data";
+import { useIntegrationCategories } from "./useIntegrationCategories";
 
 export const useIntegrations = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const { categories, isLoading, error } = useIntegrationCategories();
 
   // Filter categories based on search query and active tab
   const filteredCategories = useMemo(() => {
-    return integrationCategories.map(category => ({
+    if (isLoading || !categories) {
+      return [];
+    }
+
+    return categories.map(category => ({
       ...category,
       integrations: category.integrations.filter(integration => {
         const matchesSearch = 
@@ -24,26 +29,29 @@ export const useIntegrations = () => {
         return matchesSearch;
       })
     })).filter(category => category.integrations.length > 0);
-  }, [searchQuery, activeTab]);
+  }, [categories, searchQuery, activeTab, isLoading]);
 
   // Count available and upcoming integrations
   const totalIntegrations = useMemo(() => {
-    return integrationCategories.reduce(
+    if (isLoading || !categories) return 0;
+    return categories.reduce(
       (acc, category) => acc + category.integrations.length, 0
     );
-  }, []);
+  }, [categories, isLoading]);
 
   const availableCount = useMemo(() => {
-    return integrationCategories.reduce(
+    if (isLoading || !categories) return 0;
+    return categories.reduce(
       (acc, category) => acc + category.integrations.filter(i => i.isAvailable).length, 0
     );
-  }, []);
+  }, [categories, isLoading]);
   
   const upcomingCount = useMemo(() => {
-    return integrationCategories.reduce(
+    if (isLoading || !categories) return 0;
+    return categories.reduce(
       (acc, category) => acc + category.integrations.filter(i => !i.isAvailable).length, 0
     );
-  }, []);
+  }, [categories, isLoading]);
 
   return {
     searchQuery,
@@ -53,6 +61,8 @@ export const useIntegrations = () => {
     filteredCategories,
     totalIntegrations,
     availableCount,
-    upcomingCount
+    upcomingCount,
+    isLoading,
+    error
   };
 };

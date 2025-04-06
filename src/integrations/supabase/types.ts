@@ -9,7 +9,59 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      integration_categories: {
+        Row: {
+          description: string
+          icon: string
+          id: string
+          title: string
+        }
+        Insert: {
+          description: string
+          icon: string
+          id: string
+          title: string
+        }
+        Update: {
+          description?: string
+          icon?: string
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      integrations: {
+        Row: {
+          category_id: string
+          description: string
+          id: string
+          is_available: boolean
+          name: string
+        }
+        Insert: {
+          category_id: string
+          description: string
+          id: string
+          is_available?: boolean
+          name: string
+        }
+        Update: {
+          category_id?: string
+          description?: string
+          id?: string
+          is_available?: boolean
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integrations_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "integration_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
