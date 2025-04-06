@@ -9,13 +9,13 @@ import { Toaster } from "@/components/ui/sonner";
 import App from "./App";
 import "./index.css";
 import { ThemeProvider } from "./components/ThemeProvider";
-import { CLERK_PUBLISHABLE_KEY } from "./lib/clerk";
+import { VITE_CLERK_PUBLISHABLE_KEY } from "./lib/clerk";
 
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+    <ClerkProvider publishableKey={VITE_CLERK_PUBLISHABLE_KEY}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
