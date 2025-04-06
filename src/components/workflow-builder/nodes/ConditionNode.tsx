@@ -5,7 +5,7 @@ import { SplitSquareVertical } from "lucide-react";
 import { NodeData } from './types';
 import NodeHandle from './NodeHandle';
 
-const ConditionNode: React.FC<NodeProps<NodeData>> = ({ data }) => {
+const ConditionNode: React.FC<NodeProps> = ({ data }) => {
   return (
     <div className="w-60 bg-white dark:bg-slate-800 border-2 border-amber-400 rounded-md p-3 shadow-md">
       <div className="flex items-center gap-2">

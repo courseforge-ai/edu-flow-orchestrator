@@ -5,7 +5,7 @@ import { Play } from "lucide-react";
 import { NodeData } from './types';
 import NodeHandle from './NodeHandle';
 
-const TriggerNode: React.FC<NodeProps<NodeData>> = ({ data }) => {
+const TriggerNode: React.FC<NodeProps> = ({ data }) => {
   return (
     <div className="w-60 bg-white dark:bg-slate-800 border-2 border-green-400 rounded-md p-3 shadow-md">
       <div className="flex items-center gap-2">

@@ -4,7 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Search } from 'lucide-react';
 import { Input } from "@/components/ui/input";
-import { useIntegrationCategories } from '@/pages/integrations/useIntegrations';
+import { useIntegrationCategories } from '@/pages/integrations/useIntegrationCategories';
 
 const WorkflowSidebar = () => {
   const { categories, isLoading } = useIntegrationCategories();
