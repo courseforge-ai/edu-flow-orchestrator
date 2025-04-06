@@ -1,6 +1,7 @@
 
 import { useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
+import { Anvil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HeroSection } from "@/components/marketing/HeroSection";
 import { FeaturesSection } from "@/components/marketing/FeaturesSection";
@@ -17,6 +18,7 @@ const Index = () => {
       <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-md">
         <div className="container mx-auto flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
+            <Anvil className="h-6 w-6 text-purple-600" />
             <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">CourseForge</span>
           </Link>
           
