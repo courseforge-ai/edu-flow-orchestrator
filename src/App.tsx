@@ -14,6 +14,7 @@ import Users from "./pages/Users";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
+import WorkflowBuilder from "./pages/workflow-builder";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
             <Route path="/workflows" element={<RequireAuth><Workflows /></RequireAuth>} />
+            <Route path="/workflow-builder" element={<RequireAuth><WorkflowBuilder /></RequireAuth>} />
             <Route path="/integrations" element={<RequireAuth><Integrations /></RequireAuth>} />
             <Route path="/users" element={<RequireAuth><Users /></RequireAuth>} />
             <Route path="/sign-in/*" element={<SignIn />} />
