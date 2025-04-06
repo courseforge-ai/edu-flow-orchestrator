@@ -7,7 +7,7 @@ import {
   Users, 
   LogOut 
 } from "lucide-react";
-import { useClerk } from "@clerk/clerk-react";
+import { useClerk, UserButton } from "@clerk/clerk-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -54,7 +54,11 @@ export function Sidebar() {
         </div>
       </div>
       <Separator />
-      <div className="mt-auto p-4">
+      <div className="mt-auto p-4 space-y-4">
+        <div className="flex items-center gap-2 px-3 py-2">
+          <UserButton afterSignOutUrl="/" />
+          <span className="text-sm">Account</span>
+        </div>
         <Button 
           variant="outline" 
           className="w-full justify-start"

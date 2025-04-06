@@ -7,6 +7,9 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ClerkLoaded, useAuth } from "@clerk/clerk-react";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import Workflows from "./pages/Workflows";
+import Integrations from "./pages/Integrations";
+import Users from "./pages/Users";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
@@ -38,9 +41,9 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-            <Route path="/workflows" element={<RequireAuth><Dashboard /></RequireAuth>} />
-            <Route path="/integrations" element={<RequireAuth><Dashboard /></RequireAuth>} />
-            <Route path="/users" element={<RequireAuth><Dashboard /></RequireAuth>} />
+            <Route path="/workflows" element={<RequireAuth><Workflows /></RequireAuth>} />
+            <Route path="/integrations" element={<RequireAuth><Integrations /></RequireAuth>} />
+            <Route path="/users" element={<RequireAuth><Users /></RequireAuth>} />
             <Route path="/sign-in/*" element={<SignIn />} />
             <Route path="/sign-up/*" element={<SignUp />} />
             <Route path="*" element={<NotFound />} />
