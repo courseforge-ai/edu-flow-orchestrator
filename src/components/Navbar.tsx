@@ -1,5 +1,4 @@
-
-import { Anvil, Menu } from "lucide-react";
+import { Anvil, ChevronDown, Menu, Plug } from "lucide-react";
 import { useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -7,6 +6,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Link } from "react-router-dom";
 import { DarkModeToggle } from "./DarkModeToggle";
 import { UserButton } from "@clerk/clerk-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Navbar() {
   const { isSignedIn, signOut } = useAuth();
@@ -18,16 +23,30 @@ export function Navbar() {
       <Link to="/dashboard" className="text-sm font-medium hover:text-primary">
         Dashboard
       </Link>
-      <Link to="/workflows" className="text-sm font-medium hover:text-primary">
-        Workflows
-      </Link>
-      <Link to="/integrations" className="text-sm font-medium hover:text-primary">
-        Integrations
-      </Link>
+      
+      {/* Connect dropdown for Workflows and Integrations */}
+      <DropdownMenu>
+        <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium hover:text-primary">
+          <Plug className="h-4 w-4" />
+          Connect <ChevronDown className="h-3 w-3" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          <DropdownMenuItem asChild>
+            <Link to="/workflows" className="w-full">Workflows</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to="/integrations" className="w-full">Integrations</Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      
       <Link to="/users" className="text-sm font-medium hover:text-primary">
         Users
       </Link>
-      <Link to="/admin" className="text-sm font-medium hover:text-primary">
+      <Link 
+        to="/admin" 
+        className="text-sm font-medium bg-purple-100 text-purple-800 px-2 py-1 rounded-md hover:bg-purple-200 dark:bg-purple-900 dark:text-purple-100 dark:hover:bg-purple-800 transition-colors"
+      >
         Super Admin
       </Link>
     </>

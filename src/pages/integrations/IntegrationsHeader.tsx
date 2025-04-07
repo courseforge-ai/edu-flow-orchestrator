@@ -1,8 +1,13 @@
 
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LinkIcon, Search } from "lucide-react";
+import { LinkIcon, Search, Menu } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
+import { PageTitle } from "@/components/PageTitle";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sidebar, SidebarProvider } from "@/components/ui/sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface IntegrationsHeaderProps {
   searchQuery: string;
@@ -21,17 +26,32 @@ export const IntegrationsHeader = ({
   availableCount, 
   upcomingCount
 }: IntegrationsHeaderProps) => {
+  const isMobile = useIsMobile();
+
   return (
     <>
-      <div className="flex flex-col gap-2 mb-6">
-        <div className="flex items-center gap-2">
-          <LinkIcon className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-bold">Integrations</h1>
-        </div>
-        <p className="text-muted-foreground">
-          Connect your learning platforms, communication tools, and more to build powerful automated workflows.
-        </p>
-      </div>
+      <PageTitle title="Integrations" icon={LinkIcon}>
+        {/* Mobile sidebar trigger */}
+        {isMobile && (
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Open sidebar</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="p-0 w-[240px] sm:w-[300px]">
+              <SidebarProvider>
+                <Sidebar />
+              </SidebarProvider>
+            </SheetContent>
+          </Sheet>
+        )}
+      </PageTitle>
+      
+      <p className="text-muted-foreground mb-6">
+        Connect your learning platforms, communication tools, and more to build powerful automated workflows.
+      </p>
       
       <div className="mb-6 space-y-4">
         <div className="relative">
