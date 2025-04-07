@@ -74,9 +74,30 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-md">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-2">
-          {/* On mobile, show the hamburger that opens the menu */}
-          {isMobile && (
+        {/* Brand/logo link */}
+        <Link to={isSignedIn ? "/dashboard" : "/"} className="flex items-center gap-2 text-xl font-bold">
+          <Anvil className="h-6 w-6" />
+          CourseForge
+        </Link>
+        
+        {/* Desktop nav: display links and auth buttons inline */}
+        {!isMobile && (
+          <>
+            <nav className="hidden md:flex items-center space-x-6">
+              {navLinks}
+            </nav>
+            <div className="flex items-center gap-4">
+              {authLinks}
+            </div>
+          </>
+        )}
+        
+        {/* Moved hamburger menu to the right side */}
+        {isMobile && (
+          <div className="flex items-center gap-2">
+            {isSignedIn && (
+              <UserButton afterSignOutUrl="/" />
+            )}
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon">
@@ -84,7 +105,7 @@ export function Navbar() {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[240px] sm:w-[300px] p-4">
+              <SheetContent side="right" className="w-[240px] sm:w-[300px] p-4">
                 <nav className="flex flex-col space-y-4">
                   {navLinks}
                   <div className="pt-4 border-t">
@@ -117,23 +138,7 @@ export function Navbar() {
                 </nav>
               </SheetContent>
             </Sheet>
-          )}
-          {/* Brand/logo link */}
-          <Link to={isSignedIn ? "/dashboard" : "/"} className="flex items-center gap-2 text-xl font-bold">
-            <Anvil className="h-6 w-6" />
-            CourseForge
-          </Link>
-        </div>
-        {/* Desktop nav: display links and auth buttons inline */}
-        {!isMobile && (
-          <>
-            <nav className="hidden md:flex items-center space-x-6">
-              {navLinks}
-            </nav>
-            <div className="flex items-center gap-4">
-              {authLinks}
-            </div>
-          </>
+          </div>
         )}
       </div>
     </header>

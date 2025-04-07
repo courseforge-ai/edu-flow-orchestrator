@@ -3,9 +3,11 @@ import { useUser } from "@clerk/clerk-react";
 import { Navigate } from "react-router-dom";
 import { UserProfile } from "@/components/UserProfile";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sidebar } from "@/components/Sidebar";
+import { Sidebar, SidebarTrigger } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Dashboard = () => {
   const { isSignedIn, isLoaded } = useUser();
@@ -32,9 +34,26 @@ const Dashboard = () => {
         <main className="flex-1 overflow-auto pb-16 md:pb-4 w-full">
           <div className="container mx-auto py-4 px-4 md:px-6">
             <div className="grid gap-6">
-              <div className="flex items-center gap-2">
-                <LayoutDashboard className="h-6 w-6" />
-                <h1 className="text-2xl font-bold">Dashboard</h1>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <LayoutDashboard className="h-6 w-6" />
+                  <h1 className="text-2xl font-bold">Dashboard</h1>
+                </div>
+                
+                {/* Add mobile sidebar trigger */}
+                {isMobile && (
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button variant="outline" size="icon" className="md:hidden">
+                        <Menu className="h-5 w-5" />
+                        <span className="sr-only">Open sidebar</span>
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="p-0 w-[240px] sm:w-[300px]">
+                      <Sidebar />
+                    </SheetContent>
+                  </Sheet>
+                )}
               </div>
               
               <UserProfile />
