@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Sidebar } from "@/components/Sidebar";
+import { Sidebar, SidebarProvider } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
@@ -30,7 +30,11 @@ const WorkflowBuilder = () => {
   
   return (
     <div className="flex h-screen">
-      {!isMobile && <Sidebar />}
+      {!isMobile && (
+        <SidebarProvider>
+          <Sidebar />
+        </SidebarProvider>
+      )}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <div className="border-b p-4 flex justify-between items-center bg-background">

@@ -1,6 +1,6 @@
 
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Sidebar } from "@/components/Sidebar";
+import { Sidebar, SidebarProvider } from "@/components/ui/sidebar";
 import { IntegrationsHeader } from "./IntegrationsHeader";
 import { IntegrationsContent } from "./IntegrationsContent";
 import { UserConnections } from "./UserConnections";
@@ -24,7 +24,11 @@ const Integrations = () => {
 
   return (
     <div className="flex h-screen">
-      {!isMobile && <Sidebar />}
+      {!isMobile && (
+        <SidebarProvider>
+          <Sidebar />
+        </SidebarProvider>
+      )}
       <div className="flex-1 overflow-hidden">
         <div className="container mx-auto py-4 h-full flex flex-col">
           <h1 className="text-2xl font-bold mb-6">Integrations</h1>

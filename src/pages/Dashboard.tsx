@@ -3,7 +3,7 @@ import { useUser } from "@clerk/clerk-react";
 import { Navigate } from "react-router-dom";
 import { UserProfile } from "@/components/UserProfile";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sidebar, SidebarTrigger } from "@/components/ui/sidebar";
+import { Sidebar, SidebarProvider } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { LayoutDashboard, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,9 @@ const Dashboard = () => {
       <div className="flex flex-1">
         {!isMobile && (
           <aside className="hidden md:flex w-64 flex-col border-r bg-background">
-            <Sidebar />
+            <SidebarProvider>
+              <Sidebar />
+            </SidebarProvider>
           </aside>
         )}
         <main className="flex-1 overflow-auto pb-16 md:pb-4 w-full">
@@ -50,7 +52,9 @@ const Dashboard = () => {
                       </Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-[240px] sm:w-[300px]">
-                      <Sidebar />
+                      <SidebarProvider>
+                        <Sidebar />
+                      </SidebarProvider>
                     </SheetContent>
                   </Sheet>
                 )}
