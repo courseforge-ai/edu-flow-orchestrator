@@ -15,7 +15,8 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import { CanvasConnector } from "@/components/integrations/canvas/CanvasConnector";
-import { IntegrationConnection, useIntegrationConnections } from "./useIntegrationConnections";
+import { useIntegrationConnections } from "./useIntegrationConnections";
+import { IntegrationConnection } from "@/integrations/supabase/integration-types";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const iconMapping: Record<string, React.ReactNode> = {
