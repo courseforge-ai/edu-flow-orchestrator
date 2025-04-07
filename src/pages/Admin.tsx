@@ -7,12 +7,64 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useIntegrationCategories } from "./integrations/useIntegrationCategories";
+import { useClerk, useOrganizationList } from "@clerk/clerk-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { PageTitle } from "@/components/PageTitle";
+import { Settings } from "lucide-react";
+
+// Form schema for organization creation
+const organizationSchema = z.object({
+  name: z.string().min(3, "Organization name must be at least 3 characters"),
+  slug: z.string().min(3, "Slug must be at least 3 characters").regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens"),
+});
 
 export default function Admin() {
   const { categories, isLoading } = useIntegrationCategories();
   const [activeTab, setActiveTab] = useState("integrations");
+  const { createOrganization } = useClerk();
+  const { userMemberships, isLoaded } = useOrganizationList();
+  const [isCreating, setIsCreating] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
-  if (isLoading) {
+  // Create form for organization creation
+  const form = useForm<z.infer<typeof organizationSchema>>({
+    resolver: zodResolver(organizationSchema),
+    defaultValues: {
+      name: "",
+      slug: "",
+    },
+  });
+
+  // Handle organization creation
+  const handleCreateOrg = async (values: z.infer<typeof organizationSchema>) => {
+    try {
+      setIsCreating(true);
+      await createOrganization({ name: values.name, slug: values.slug });
+      form.reset();
+      setDialogOpen(false);
+    } catch (error) {
+      console.error("Failed to create organization:", error);
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  // Generate slug from name
+  const generateSlug = (name: string) => {
+    return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  };
+
+  // Auto-generate slug when name changes
+  const watchedName = form.watch("name");
+  if (watchedName && !form.getValues("slug")) {
+    form.setValue("slug", generateSlug(watchedName));
+  }
+
+  if (isLoading || !isLoaded) {
     return (
       <div className="container mx-auto py-10">
         <div className="flex items-center justify-center h-64">
@@ -24,18 +76,15 @@ export default function Admin() {
 
   return (
     <div className="container mx-auto py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Super Admin</h1>
-        <p className="text-muted-foreground mt-2">
-          Manage your platform settings and integrations.
-        </p>
-      </div>
+      <PageTitle title="Super Admin" icon={Settings}>
+        {/* Add any actions you want here */}
+      </PageTitle>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="mb-4">
           <TabsTrigger value="integrations">Integrations</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
-          <TabsTrigger value="users">User Management</TabsTrigger>
+          <TabsTrigger value="organizations">Organization Management</TabsTrigger>
         </TabsList>
 
         <TabsContent value="integrations" className="space-y-8">
@@ -150,18 +199,129 @@ export default function Admin() {
           </div>
         </TabsContent>
 
-        <TabsContent value="users" className="space-y-6">
+        <TabsContent value="organizations" className="space-y-6">
           <div>
-            <h2 className="text-xl font-semibold mb-4">User Permissions</h2>
+            <h2 className="text-xl font-semibold mb-4">Organization Management</h2>
             <p className="text-sm text-muted-foreground mb-6">
-              Manage access to administrative features
+              Manage organizations and their settings
             </p>
             
-            <div className="rounded-md bg-amber-50 p-4 dark:bg-amber-950">
-              <p className="text-sm text-amber-800 dark:text-amber-200">
-                User management functionality will be implemented in a future update.
-              </p>
+            <div className="flex justify-end mb-6">
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button>Create New Organization</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create New Organization</DialogTitle>
+                    <DialogDescription>
+                      Add a new organization to the platform. This will create a new workspace for collaboration.
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(handleCreateOrg)} className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Organization Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter organization name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="slug"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Organization Slug</FormLabel>
+                            <FormControl>
+                              <Input placeholder="organization-slug" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <DialogFooter>
+                        <Button type="submit" disabled={isCreating}>
+                          {isCreating ? "Creating..." : "Create Organization"}
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </Form>
+                </DialogContent>
+              </Dialog>
             </div>
+            
+            {userMemberships.isLoaded && userMemberships.data.length > 0 ? (
+              <div className="grid gap-4">
+                {userMemberships.data.map((membership) => (
+                  <Card key={membership.organization.id}>
+                    <CardHeader>
+                      <CardTitle>{membership.organization.name}</CardTitle>
+                      <CardDescription>
+                        Slug: {membership.organization.slug || "No slug defined"}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <p className="text-sm font-medium mb-1">Your Role</p>
+                          <p className="text-xs bg-primary/10 text-primary px-2 py-1 rounded inline-block">
+                            {membership.role}
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            Manage Members
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            Settings
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm">Created</p>
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(membership.organization.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm">Members</p>
+                          <p className="text-sm text-muted-foreground">
+                            {membership.organization.membersCount || "Loading..."}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle>No Organizations</CardTitle>
+                  <CardDescription>
+                    You haven't created any organizations yet.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Organizations allow you to manage access to resources and collaborate with team members.
+                    Create your first organization to get started.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </TabsContent>
       </Tabs>
