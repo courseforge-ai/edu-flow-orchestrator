@@ -26,13 +26,6 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex flex-1">
-        {!isMobile && (
-          <aside className="hidden md:flex w-64 flex-col border-r bg-background">
-            <SidebarProvider>
-              <Sidebar />
-            </SidebarProvider>
-          </aside>
-        )}
         <main className="flex-1 overflow-auto pb-16 md:pb-4 w-full">
           <div className="container mx-auto py-4 px-4 md:px-6">
             <div className="grid gap-6">
@@ -42,7 +35,7 @@ const Dashboard = () => {
                   <h1 className="text-2xl font-bold">Dashboard</h1>
                 </div>
                 
-                {/* Add mobile sidebar trigger */}
+                {/* Mobile sidebar trigger */}
                 {isMobile && (
                   <Sheet>
                     <SheetTrigger asChild>

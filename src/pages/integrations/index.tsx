@@ -6,6 +6,9 @@ import { IntegrationsContent } from "./IntegrationsContent";
 import { UserConnections } from "./UserConnections";
 import { useIntegrations } from "./useIntegrations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Integrations = () => {
   const {
@@ -24,14 +27,28 @@ const Integrations = () => {
 
   return (
     <div className="flex h-screen">
-      {!isMobile && (
-        <SidebarProvider>
-          <Sidebar />
-        </SidebarProvider>
-      )}
       <div className="flex-1 overflow-hidden">
         <div className="container mx-auto py-4 h-full flex flex-col">
-          <h1 className="text-2xl font-bold mb-6">Integrations</h1>
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-2xl font-bold">Integrations</h1>
+            
+            {/* Mobile sidebar trigger */}
+            {isMobile && (
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon" className="md:hidden">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Open sidebar</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="p-0 w-[240px] sm:w-[300px]">
+                  <SidebarProvider>
+                    <Sidebar />
+                  </SidebarProvider>
+                </SheetContent>
+              </Sheet>
+            )}
+          </div>
           
           <Tabs defaultValue="available" className="w-full">
             <TabsList className="w-full max-w-md mb-6">

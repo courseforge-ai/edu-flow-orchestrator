@@ -4,11 +4,12 @@ import { Sidebar, SidebarProvider } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { Save, PlayCircle } from "lucide-react";
+import { Save, PlayCircle, Menu } from "lucide-react";
 import WorkflowCanvas from "@/components/workflow-builder/WorkflowCanvas";
 import WorkflowSidebar from "@/components/workflow-builder/WorkflowSidebar";
 import { ReactFlowProvider } from "@xyflow/react";
 import { toast } from "@/hooks/use-toast";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const WorkflowBuilder = () => {
   const isMobile = useIsMobile();
@@ -30,11 +31,6 @@ const WorkflowBuilder = () => {
   
   return (
     <div className="flex h-screen">
-      {!isMobile && (
-        <SidebarProvider>
-          <Sidebar />
-        </SidebarProvider>
-      )}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <div className="border-b p-4 flex justify-between items-center bg-background">
@@ -47,6 +43,22 @@ const WorkflowBuilder = () => {
             />
           </div>
           <div className="flex gap-3">
+            {/* Mobile sidebar trigger */}
+            {isMobile && (
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon" className="md:hidden">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Open sidebar</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="p-0 w-[240px] sm:w-[300px]">
+                  <SidebarProvider>
+                    <Sidebar />
+                  </SidebarProvider>
+                </SheetContent>
+              </Sheet>
+            )}
             <Button variant="outline" onClick={handleSave}>
               <Save className="mr-2 h-4 w-4" />
               Save
