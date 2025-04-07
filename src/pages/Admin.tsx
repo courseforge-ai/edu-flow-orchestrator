@@ -260,7 +260,7 @@ export default function Admin() {
               </Dialog>
             </div>
             
-            {userMemberships.isLoaded && userMemberships.data.length > 0 ? (
+            {isLoaded && userMemberships.data.length > 0 ? (
               <div className="grid gap-4">
                 {userMemberships.data.map((membership) => (
                   <Card key={membership.organization.id}>
