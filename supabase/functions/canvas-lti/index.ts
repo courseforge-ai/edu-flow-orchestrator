@@ -1,114 +1,152 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Create a Supabase client
-const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 serve(async (req) => {
-  // Handle CORS preflight requests
+  // Handle CORS preflight request
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, {
+      headers: corsHeaders,
+    });
   }
-  
-  // Parse the URL to get the path
-  const url = new URL(req.url);
-  const path = url.pathname.split('/').pop();
 
   try {
-    if (path === 'launch') {
-      return await handleLaunch(req);
-    } else if (path === 'login') {
-      return await handleLogin(req);
-    } else {
-      return new Response(JSON.stringify({ error: 'Invalid endpoint' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders },
-      });
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+
+    // Initialize Supabase client with service role key
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Get request path
+    const url = new URL(req.url);
+    const path = url.pathname.split('/').pop();
+
+    // Handle login request
+    if (path === 'login' && req.method === 'POST') {
+      const { iss, client_id, connection_id } = await req.json();
+
+      if (!iss || !client_id || !connection_id) {
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Missing required parameters: iss, client_id, or connection_id' 
+          }),
+          { 
+            status: 400, 
+            headers: { 
+              'Content-Type': 'application/json',
+              ...corsHeaders,
+            } 
+          }
+        );
+      }
+
+      // In a real implementation, we would:
+      // 1. Create a state parameter and nonce for OIDC flow
+      // 2. Store them in a session or database
+      // 3. Create the redirect URL to Canvas's OAuth2/OIDC login endpoint
+      
+      // This is a mock implementation
+      const mockRedirectUrl = `${iss}/login/oauth2/auth?client_id=${client_id}&response_type=id_token&redirect_uri=${encodeURIComponent(url.origin + '/api/canvas-lti/launch')}&state=mock-state&scope=openid&response_mode=form_post&nonce=mock-nonce`;
+      
+      // Log the connection attempt
+      console.log(`Canvas LTI login initiated: Connection ID ${connection_id}, Canvas URL: ${iss}`);
+      
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          redirect_url: mockRedirectUrl 
+        }),
+        { 
+          status: 200, 
+          headers: { 
+            'Content-Type': 'application/json',
+            ...corsHeaders,
+          } 
+        }
+      );
     }
+    
+    // Handle launch request
+    if (path === 'launch' && req.method === 'POST') {
+      const formData = await req.formData();
+      const idToken = formData.get('id_token');
+      const state = formData.get('state');
+      
+      if (!idToken || !state) {
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Missing ID token or state parameter' 
+          }),
+          { 
+            status: 400, 
+            headers: { 
+              'Content-Type': 'application/json',
+              ...corsHeaders,
+            } 
+          }
+        );
+      }
+      
+      // In a real implementation, we would:
+      // 1. Verify the state parameter matches what we stored
+      // 2. Decode and verify the JWT ID token using the platform's JWKS
+      // 3. Extract the user information and context from the ID token
+      // 4. Create or update a Canvas user record in our database
+      
+      // This is a mock response
+      console.log(`Canvas LTI launch completed: State ${state}, ID token received`);
+      
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'Launch successful' 
+        }),
+        { 
+          status: 200, 
+          headers: { 
+            'Content-Type': 'application/json',
+            ...corsHeaders,
+          } 
+        }
+      );
+    }
+
+    // Return 404 for any other paths
+    return new Response(
+      JSON.stringify({ 
+        success: false, 
+        error: 'Not found' 
+      }),
+      { 
+        status: 404, 
+        headers: { 
+          'Content-Type': 'application/json',
+          ...corsHeaders,
+        } 
+      }
+    );
   } catch (error) {
     console.error('Error processing request:', error);
     
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json', ...corsHeaders },
-    });
+    return new Response(
+      JSON.stringify({ 
+        success: false, 
+        error: error.message 
+      }),
+      { 
+        status: 500, 
+        headers: { 
+          'Content-Type': 'application/json',
+          ...corsHeaders,
+        } 
+      }
+    );
   }
 });
-
-async function handleLogin(req: Request) {
-  // Parse request body
-  const data = await req.json();
-  const { iss, client_id, connection_id } = data;
-  
-  console.log(`Processing login request for ${iss} with client ${client_id} and connection ${connection_id}`);
-  
-  // In a real implementation, we would:
-  // 1. Verify the connection_id belongs to the authenticated user
-  // 2. Generate a state and nonce for OIDC
-  // 3. Store them in a temporary storage with expiration
-  // 4. Redirect to the appropriate authorization URL
-  
-  // For now, we're simulating the response
-  return new Response(JSON.stringify({ 
-    success: true,
-    redirect_url: `https://canvas.example.com/auth?client_id=${client_id}&state=some-state&nonce=some-nonce` 
-  }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json', ...corsHeaders },
-  });
-}
-
-async function handleLaunch(req: Request) {
-  // Parse request body
-  const data = await req.json();
-  const { id_token, connection_id } = data;
-  
-  console.log(`Processing launch request for connection ${connection_id}`);
-
-  // In a real implementation, we would:
-  // 1. Verify the JWT token using the public key from Canvas
-  // 2. Extract user and context information
-  // 3. Create an integration event in our database
-  // 4. Return success with the parsed information
-
-  // For now, we're simulating a successful launch
-  
-  // Create an integration event
-  const { data: event, error } = await supabase
-    .from('integration_events')
-    .insert({
-      connection_id,
-      trigger_key: 'lti_launch',
-      event_data: {
-        context_id: 'course_123',
-        resource_link_id: 'assignment_456',
-        user_id: 'user_789',
-        roles: ['Instructor'],
-        timestamp: new Date().toISOString(),
-      },
-      processed: false
-    })
-    .select('id')
-    .single();
-    
-  if (error) {
-    throw new Error(`Failed to create event: ${error.message}`);
-  }
-
-  return new Response(JSON.stringify({ 
-    success: true,
-    event_id: event.id,
-    message: 'LTI launch processed successfully'
-  }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json', ...corsHeaders },
-  });
-}

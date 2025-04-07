@@ -50,7 +50,7 @@ export const CanvasConnector = () => {
       setIsLoading(true);
       
       // First, get the Canvas connector ID
-      const { data: connectors, error: connectorError } = await supabase
+      const { data: connectors, error: connectorError } = await (supabase as any)
         .from('integration_connectors')
         .select('id')
         .eq('key', 'canvas_lms')
@@ -61,7 +61,7 @@ export const CanvasConnector = () => {
       }
       
       // Create the user connection record
-      const { data: connection, error: connectionError } = await supabase
+      const { data: connection, error: connectionError } = await (supabase as any)
         .from('user_integration_connections')
         .insert({
           user_id: user.id,

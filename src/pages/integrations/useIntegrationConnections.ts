@@ -2,21 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@clerk/clerk-react";
-
-export interface IntegrationConnection {
-  id: string;
-  connection_name: string;
-  auth_credentials: any;
-  is_active: boolean;
-  created_at: string;
-  connector: {
-    id: string;
-    name: string;
-    key: string;
-    icon: string;
-    description: string;
-  }
-}
+import { IntegrationConnection } from "@/integrations/supabase/integration-types";
 
 export const useIntegrationConnections = () => {
   const { user } = useUser();
@@ -30,7 +16,9 @@ export const useIntegrationConnections = () => {
     try {
       setIsLoading(true);
       
-      const { data, error } = await supabase
+      // Using any type here since the Supabase TypeScript definitions 
+      // don't yet include our custom tables
+      const { data, error } = await (supabase as any)
         .from('user_integration_connections')
         .select(`
           id,
@@ -53,11 +41,13 @@ export const useIntegrationConnections = () => {
     }
   };
 
-  const addConnection = async (connectionData: any) => {
+  const addConnection = async (connectionData: Partial<IntegrationConnection>) => {
     if (!user?.id) throw new Error("User not authenticated");
     
     try {
-      const { data, error } = await supabase
+      // Using any type here since the Supabase TypeScript definitions
+      // don't yet include our custom tables
+      const { data, error } = await (supabase as any)
         .from('user_integration_connections')
         .insert({
           ...connectionData,
@@ -81,7 +71,9 @@ export const useIntegrationConnections = () => {
     if (!user?.id) throw new Error("User not authenticated");
     
     try {
-      const { error } = await supabase
+      // Using any type here since the Supabase TypeScript definitions
+      // don't yet include our custom tables
+      const { error } = await (supabase as any)
         .from('user_integration_connections')
         .delete()
         .eq('id', connectionId)

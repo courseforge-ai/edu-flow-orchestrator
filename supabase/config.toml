@@ -2,4 +2,4 @@
 project_id = "csfvsbiivitndafwabqq"
 
 [functions.canvas-lti]
-verify_jwt = true
+verify_jwt = false
