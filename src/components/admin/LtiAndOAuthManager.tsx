@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -97,7 +96,7 @@ const ltiToolFormSchema = z.object({
   auth_login_url: z.string().url("Must be a valid URL").optional(),
   auth_token_url: z.string().url("Must be a valid URL").optional(),
   jwks_url: z.string().url("Must be a valid URL").optional(),
-  redirect_uris: z.string().transform(val => val.split("\n").filter(Boolean)),
+  redirect_uris: z.string().transform(val => val ? val.split("\n").filter(Boolean) : []),
   custom_fields: z.string().optional().transform(val => {
     try {
       return val ? JSON.parse(val) : {};
