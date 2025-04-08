@@ -120,6 +120,10 @@ const oauthProviderFormSchema = z.object({
   scope: z.string().optional(),
 });
 
+// Define a type for the form data that includes the transformed values
+type LtiToolFormValues = z.input<typeof ltiToolFormSchema>;
+type LtiToolFormTransformed = z.output<typeof ltiToolFormSchema>;
+
 export function LtiAndOAuthManager() {
   const [ltiTools, setLtiTools] = useState<LtiTool[]>(sampleLtiTools);
   const [oauthProviders, setOAuthProviders] = useState<OAuthProvider[]>(sampleOAuthProviders);
@@ -129,7 +133,7 @@ export function LtiAndOAuthManager() {
   const { toast } = useToast();
 
   // LTI Tool form
-  const ltiForm = useForm<z.infer<typeof ltiToolFormSchema>>({
+  const ltiForm = useForm<LtiToolFormValues>({
     resolver: zodResolver(ltiToolFormSchema),
     defaultValues: {
       name: "",
@@ -152,23 +156,27 @@ export function LtiAndOAuthManager() {
   });
 
   // Handle LTI Tool submission
-  const onLtiSubmit = (values: z.infer<typeof ltiToolFormSchema>) => {
+  const onLtiSubmit = (values: LtiToolFormValues) => {
     setIsLoading(true);
+    
+    // Get the transformed values with proper types
+    const transformedValues = ltiToolFormSchema.parse(values) as LtiToolFormTransformed;
+    
     // In a real app, this would be an API call
     setTimeout(() => {
       const newTool: LtiTool = {
         id: `${Date.now().toString()}`,
         created_at: new Date().toISOString(),
-        name: values.name,
-        description: values.description,
-        is_active: values.is_active,
-        lti_version: values.lti_version,
-        client_id: values.client_id,
-        auth_login_url: values.auth_login_url,
-        auth_token_url: values.auth_token_url,
-        jwks_url: values.jwks_url,
-        redirect_uris: values.redirect_uris,
-        custom_fields: values.custom_fields,
+        name: transformedValues.name,
+        description: transformedValues.description,
+        is_active: transformedValues.is_active,
+        lti_version: transformedValues.lti_version,
+        client_id: transformedValues.client_id,
+        auth_login_url: transformedValues.auth_login_url,
+        auth_token_url: transformedValues.auth_token_url,
+        jwks_url: transformedValues.jwks_url,
+        redirect_uris: transformedValues.redirect_uris,
+        custom_fields: transformedValues.custom_fields,
       };
       setLtiTools([...ltiTools, newTool]);
       setIsLoading(false);
@@ -176,7 +184,7 @@ export function LtiAndOAuthManager() {
       ltiForm.reset();
       toast({
         title: "LTI Tool Added",
-        description: `${values.name} has been successfully added.`,
+        description: `${transformedValues.name} has been successfully added.`,
       });
     }, 1000);
   };
