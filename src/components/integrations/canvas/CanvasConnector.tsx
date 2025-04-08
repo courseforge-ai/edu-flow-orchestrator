@@ -8,11 +8,13 @@ import { Label } from "@/components/ui/label";
 import { GraduationCap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@clerk/clerk-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export const CanvasConnector = () => {
   const { toast } = useToast();
   const { user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
+  const [connectionId, setConnectionId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     canvasUrl: "",
@@ -100,20 +102,15 @@ export const CanvasConnector = () => {
         throw new Error(result.error || "Failed to initiate Canvas authentication");
       }
       
+      // Store the connection ID
+      setConnectionId(connection.id);
+      
       // In a real application, we would redirect to the Canvas authorization URL
-      // window.location.href = result.redirect_url;
+      window.location.href = result.redirect_url;
       
       toast({
-        title: "Connection created",
-        description: "Canvas LMS connection has been set up successfully.",
-      });
-      
-      // Clear the form
-      setFormData({
-        name: "",
-        canvasUrl: "",
-        clientId: "",
-        developerKey: ""
+        title: "Authorization initiated",
+        description: "You will be redirected to Canvas to authorize the connection.",
       });
       
     } catch (error) {
@@ -123,10 +120,48 @@ export const CanvasConnector = () => {
         description: error.message || "Failed to connect to Canvas LMS.",
         variant: "destructive"
       });
-    } finally {
       setIsLoading(false);
     }
   };
+
+  const handleReset = () => {
+    setConnectionId(null);
+    setFormData({
+      name: "",
+      canvasUrl: "",
+      clientId: "",
+      developerKey: ""
+    });
+    setIsLoading(false);
+  };
+
+  if (connectionId) {
+    return (
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <GraduationCap className="h-6 w-6 text-primary" />
+            <CardTitle>Canvas LMS Connection</CardTitle>
+          </div>
+          <CardDescription>
+            Authorization in progress
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Alert>
+            <AlertDescription>
+              You have been redirected to Canvas to authorize this application. After completion, you will be redirected back here.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+        <CardFooter>
+          <Button variant="outline" onClick={handleReset} className="w-full">
+            Reset Connection
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full max-w-md mx-auto">
