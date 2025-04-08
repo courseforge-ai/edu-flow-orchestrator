@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { PageTitle } from "@/components/PageTitle";
 import { Settings } from "lucide-react";
+import { LtiAndOAuthManager } from "@/components/admin/LtiAndOAuthManager";
 
 // Form schema for organization creation
 const organizationSchema = z.object({
@@ -156,6 +157,18 @@ export default function Admin() {
               <Button>Add Integration</Button>
             </form>
           </div>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>External Authentication</CardTitle>
+              <CardDescription>
+                Configure Learning Tools Interoperability (LTI) and OAuth providers for external systems integration.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <LtiAndOAuthManager />
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">

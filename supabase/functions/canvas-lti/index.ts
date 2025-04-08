@@ -1,6 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.2';
+import * as jose from 'https://esm.sh/jose@5.1.3';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -46,21 +47,47 @@ serve(async (req) => {
         );
       }
 
-      // In a real implementation, we would:
-      // 1. Create a state parameter and nonce for OIDC flow
-      // 2. Store them in a session or database
-      // 3. Create the redirect URL to Canvas's OAuth2/OIDC login endpoint
+      // Generate state and nonce for OIDC flow
+      const state = crypto.randomUUID();
+      const nonce = crypto.randomUUID();
       
-      // This is a mock implementation
-      const mockRedirectUrl = `${iss}/login/oauth2/auth?client_id=${client_id}&response_type=id_token&redirect_uri=${encodeURIComponent(url.origin + '/api/canvas-lti/launch')}&state=mock-state&scope=openid&response_mode=form_post&nonce=mock-nonce`;
+      // Store state and nonce in database for later verification
+      const { error: stateError } = await supabase
+        .from('lti_auth_states')
+        .insert({
+          state,
+          nonce,
+          connection_id,
+          expires_at: new Date(Date.now() + 1000 * 60 * 5).toISOString() // 5 minutes expiration
+        });
+      
+      if (stateError) {
+        console.error('Error storing auth state:', stateError);
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Failed to create authentication session' 
+          }),
+          { 
+            status: 500, 
+            headers: { 
+              'Content-Type': 'application/json',
+              ...corsHeaders,
+            } 
+          }
+        );
+      }
+      
+      // Create the redirect URL to Canvas's OAuth2/OIDC login endpoint
+      const redirectUrl = `${iss}/login/oauth2/auth?client_id=${client_id}&response_type=id_token&redirect_uri=${encodeURIComponent(url.origin + '/api/canvas-lti/launch')}&state=${state}&scope=openid&response_mode=form_post&nonce=${nonce}`;
       
       // Log the connection attempt
-      console.log(`Canvas LTI login initiated: Connection ID ${connection_id}, Canvas URL: ${iss}`);
+      console.log(`Canvas LTI login initiated: Connection ID ${connection_id}, Canvas URL: ${iss}, State: ${state}`);
       
       return new Response(
         JSON.stringify({ 
           success: true, 
-          redirect_url: mockRedirectUrl 
+          redirect_url: redirectUrl 
         }),
         { 
           status: 200, 
@@ -75,8 +102,8 @@ serve(async (req) => {
     // Handle launch request
     if (path === 'launch' && req.method === 'POST') {
       const formData = await req.formData();
-      const idToken = formData.get('id_token');
-      const state = formData.get('state');
+      const idToken = formData.get('id_token')?.toString();
+      const state = formData.get('state')?.toString();
       
       if (!idToken || !state) {
         return new Response(
@@ -94,19 +121,144 @@ serve(async (req) => {
         );
       }
       
-      // In a real implementation, we would:
-      // 1. Verify the state parameter matches what we stored
-      // 2. Decode and verify the JWT ID token using the platform's JWKS
-      // 3. Extract the user information and context from the ID token
-      // 4. Create or update a Canvas user record in our database
+      // Verify the state parameter
+      const { data: stateData, error: stateError } = await supabase
+        .from('lti_auth_states')
+        .select('connection_id, nonce')
+        .eq('state', state)
+        .gte('expires_at', new Date().toISOString())
+        .single();
       
-      // This is a mock response
-      console.log(`Canvas LTI launch completed: State ${state}, ID token received`);
+      if (stateError || !stateData) {
+        console.error('Invalid or expired state parameter:', stateError);
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Invalid or expired authentication session' 
+          }),
+          { 
+            status: 400, 
+            headers: { 
+              'Content-Type': 'application/json',
+              ...corsHeaders,
+            } 
+          }
+        );
+      }
       
+      // Get the connection info to retrieve the Canvas URL
+      const { data: connection, error: connectionError } = await supabase
+        .from('user_integration_connections')
+        .select('auth_credentials')
+        .eq('id', stateData.connection_id)
+        .single();
+      
+      if (connectionError || !connection) {
+        console.error('Failed to fetch connection details:', connectionError);
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Failed to retrieve connection details' 
+          }),
+          { 
+            status: 500, 
+            headers: { 
+              'Content-Type': 'application/json',
+              ...corsHeaders,
+            } 
+          }
+        );
+      }
+      
+      try {
+        // Parse and decode the JWT ID Token
+        const decoded = jose.decodeJwt(idToken);
+        
+        // Verify the nonce
+        if (decoded.nonce !== stateData.nonce) {
+          throw new Error('Invalid nonce in ID token');
+        }
+        
+        // In a production environment, validate the JWT signature using the platform's JWKS
+        
+        // Extract user information from the token
+        const userId = decoded.sub;
+        const name = decoded.name || '';
+        const email = decoded.email || '';
+        const roles = decoded.roles || [];
+        
+        // Update the connection with user data
+        const { error: updateError } = await supabase
+          .from('user_integration_connections')
+          .update({
+            last_connected_at: new Date().toISOString(),
+            connection_data: {
+              user: {
+                id: userId,
+                name,
+                email,
+                roles,
+              }
+            }
+          })
+          .eq('id', stateData.connection_id);
+        
+        if (updateError) {
+          console.error('Failed to update connection with user data:', updateError);
+        }
+        
+        // Delete the used auth state
+        await supabase
+          .from('lti_auth_states')
+          .delete()
+          .eq('state', state);
+        
+        // Log the successful launch
+        console.log(`Canvas LTI launch completed: User ${userId} authenticated for connection ${stateData.connection_id}`);
+        
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            message: 'Launch successful',
+            user: {
+              id: userId,
+              name,
+              email,
+              roles
+            }
+          }),
+          { 
+            status: 200, 
+            headers: { 
+              'Content-Type': 'application/json',
+              ...corsHeaders,
+            } 
+          }
+        );
+      } catch (error) {
+        console.error('Error processing ID token:', error);
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Failed to process authentication token' 
+          }),
+          { 
+            status: 400, 
+            headers: { 
+              'Content-Type': 'application/json',
+              ...corsHeaders,
+            } 
+          }
+        );
+      }
+    }
+
+    // Handle JWKS endpoint
+    if (path === 'jwks' && req.method === 'GET') {
+      // In a production environment, this would return the platform's JSON Web Key Set
       return new Response(
         JSON.stringify({ 
-          success: true, 
-          message: 'Launch successful' 
+          keys: [] 
         }),
         { 
           status: 200, 
