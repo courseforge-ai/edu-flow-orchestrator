@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -124,7 +125,12 @@ const oauthProviderFormSchema = z.object({
 type LtiToolFormValues = z.input<typeof ltiToolFormSchema>;
 type LtiToolFormTransformed = z.output<typeof ltiToolFormSchema>;
 
-export function LtiAndOAuthManager() {
+// Define the component props
+interface LtiAndOAuthManagerProps {
+  onLtiFormSubmit?: (data: LtiToolFormTransformed) => void;
+}
+
+export function LtiAndOAuthManager({ onLtiFormSubmit }: LtiAndOAuthManagerProps) {
   const [ltiTools, setLtiTools] = useState<LtiTool[]>(sampleLtiTools);
   const [oauthProviders, setOAuthProviders] = useState<OAuthProvider[]>(sampleOAuthProviders);
   const [isLoading, setIsLoading] = useState(false);
@@ -161,6 +167,11 @@ export function LtiAndOAuthManager() {
     
     // Get the transformed values with proper types
     const transformedValues = ltiToolFormSchema.parse(values) as LtiToolFormTransformed;
+    
+    // Call the external handler if provided
+    if (onLtiFormSubmit) {
+      onLtiFormSubmit(transformedValues);
+    }
     
     // In a real app, this would be an API call
     setTimeout(() => {

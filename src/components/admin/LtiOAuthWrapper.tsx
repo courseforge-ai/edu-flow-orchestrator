@@ -1,6 +1,6 @@
 
-import { useState, useEffect } from "react";
-import { LtiAndOAuthManager } from "./LtiAndOAuthManager";
+import { useState } from "react";
+import { LtiAndOAuthManager, LtiTool } from "./LtiAndOAuthManager";
 
 export function LtiOAuthWrapper() {
   // This component acts as a compatibility layer to ensure proper type handling
@@ -18,7 +18,7 @@ export function LtiOAuthWrapper() {
   };
 
   return (
-    <LtiAndOAuthManager
+    <LtiAndOAuthManager 
       onLtiFormSubmit={handleLtiFormSubmit}
     />
   );
