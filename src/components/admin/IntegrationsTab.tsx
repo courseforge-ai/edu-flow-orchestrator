@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useIntegrationCategories } from "@/pages/integrations/useIntegrationCategories";
-import { LtiAndOAuthManager } from "./LtiAndOAuthManager";
+import { LtiOAuthWrapper } from "./LtiOAuthWrapper";
 
 export const IntegrationsTab = () => {
   const { categories, isLoading } = useIntegrationCategories();
@@ -98,7 +98,7 @@ export const IntegrationsTab = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <LtiAndOAuthManager />
+          <LtiOAuthWrapper />
         </CardContent>
       </Card>
     </div>
